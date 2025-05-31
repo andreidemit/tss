@@ -6,217 +6,226 @@ public class CalculatorTests
     private readonly Calculator _calculator = new();
 
     // ========================================
-    // BLACK-BOX TESTING METHODOLOGIES
+    // STRATEGII DE TESTARE BLACK-BOX
     // ========================================
 
     // ------------------------
-    // 1. EQUIVALENCE CLASS PARTITIONING
+    // 1. CLASE DE ECHIVALENȚĂ
     // ------------------------
 
     [Theory]
-    [InlineData(10, 2, 5)]   // Valid positive numbers
-    [InlineData(-10, 2, -5)] // Negative dividend
-    [InlineData(10, -2, -5)] // Negative divisor
-    public void Divide_EquivalenceClasses_ValidInputs(int a, int b, int expected)
+    [InlineData(10, 2, 5)]   // Numere pozitive valide
+    [InlineData(-10, 2, -5)] // Deîmpărțit negativ
+    [InlineData(10, -2, -5)] // Împărțitor negativ
+    public void Divide_ClaseDeEchivalenta_InputuriValide(int a, int b, int expected)
     {
         Assert.Equal(expected, _calculator.Divide(a, b));
     }
 
     [Fact]
-    public void Divide_EquivalenceClasses_InvalidInput_DivisionByZero()
+    public void Divide_ClaseDeEchivalenta_InputInvalid_ImpartireLaZero()
     {
         Assert.Throws<ArgumentException>(() => _calculator.Divide(10, 0));
     }
 
     [Theory]
-    [InlineData(1, false)]  // Non-prime > 1
-    [InlineData(2, true)]   // Smallest prime
-    [InlineData(17, true)]  // Prime number
-    [InlineData(4, false)]  // Composite number
-    public void IsPrime_EquivalenceClasses(int number, bool expected)
+    [InlineData(1, false)]  // Non-prim > 1
+    [InlineData(2, true)]   // Cel mai mic număr prim
+    [InlineData(17, true)]  // Număr prim
+    [InlineData(4, false)]  // Număr compus
+    public void IsPrime_ClaseDeEchivalenta(int number, bool expected)
     {
         Assert.Equal(expected, _calculator.IsPrime(number));
     }
 
     // ------------------------
-    // 2. BOUNDARY VALUE ANALYSIS
+    // 2. VALORI DE FRONTIERĂ
     // ------------------------
 
     [Theory]
-    [InlineData(int.MaxValue, 1, int.MaxValue)]     // Maximum positive value
-    [InlineData(int.MinValue + 1, 1, int.MinValue + 1)] // Minimum value (avoiding overflow)
-    [InlineData(1, 1, 1)]                           // Minimum positive values
-    public void Divide_BoundaryValues(int a, int b, int expected)
+    [InlineData(int.MaxValue, 1, int.MaxValue)]     // Valoare pozitivă maximă
+    [InlineData(int.MinValue + 1, 1, int.MinValue + 1)] // Valoare minimă (evitând overflow)
+    [InlineData(1, 1, 1)]                           // Valori pozitive minime
+    public void Divide_ValoriDeFrontiera(int a, int b, int expected)
     {
         Assert.Equal(expected, _calculator.Divide(a, b));
     }
 
     [Theory]
-    [InlineData(0, false)]   // Boundary: zero
-    [InlineData(1, false)]   // Boundary: one (not prime)
-    [InlineData(2, true)]    // Boundary: smallest prime
-    public void IsPrime_BoundaryValues(int number, bool expected)
+    [InlineData(0, false)]   // Frontieră: zero
+    [InlineData(1, false)]   // Frontieră: unu (nu este prim)
+    [InlineData(2, true)]    // Frontieră: cel mai mic prim
+    public void IsPrime_ValoriDeFrontiera(int number, bool expected)
     {
         Assert.Equal(expected, _calculator.IsPrime(number));
     }
 
     [Theory]
-    [InlineData(2, 0, 1)]    // Exponent = 0 (boundary)
-    [InlineData(1, 5, 1)]    // Base = 1 (boundary)
-    public void Power_BoundaryValues(int baseNum, int exponent, int expected)
+    [InlineData(2, 0, 1)]    // Exponent = 0 (frontieră)
+    [InlineData(1, 5, 1)]    // Bază = 1 (frontieră)
+    public void Power_ValoriDeFrontiera(int baseNum, int exponent, int expected)
     {
         Assert.Equal(expected, _calculator.Power(baseNum, exponent));
     }
 
     // ========================================
-    // WHITE-BOX TESTING METHODOLOGIES
+    // STRATEGII DE TESTARE WHITE-BOX
     // ========================================
 
     // ------------------------
-    // 3. STATEMENT COVERAGE
+    // 3. ACOPERIRE INSTRUCȚIUNE
     // ------------------------
 
     [Fact]
-    public void Add_StatementCoverage()
+    public void Add_AcoperireInstructiune()
     {
         int result = _calculator.Add(2, 3);
         Assert.Equal(5, result);
     }
 
     [Fact]
-    public void Subtract_StatementCoverage()
+    public void Subtract_AcoperireInstructiune()
     {
         Assert.Equal(4, _calculator.Subtract(7, 3));
     }
 
     [Fact]
-    public void Multiply_StatementCoverage()
+    public void Multiply_AcoperireInstructiune()
     {
         Assert.Equal(12, _calculator.Multiply(4, 3));
     }
 
     // ------------------------
-    // 4. BRANCH/DECISION COVERAGE
+    // 4. ACOPERIRE DECIZIE & CONDIȚIE
     // ------------------------
 
     [Theory]
-    [InlineData(2, true)]   // Even number (true branch)
-    [InlineData(3, false)]  // Odd number (false branch)
-    public void IsEven_BranchCoverage(int number, bool expected)
+    [InlineData(2, true)]   // Număr par (ramura adevărată)
+    [InlineData(3, false)]  // Număr impar (ramura falsă)
+    public void IsEven_AcoperireDecizie(int number, bool expected)
     {
         Assert.Equal(expected, _calculator.IsEven(number));
     }
 
     [Theory]
-    [InlineData(10, 3, 1)]  // Normal modulo operation
-    public void Modulo_BranchCoverage_ValidInput(int a, int b, int expected)
+    [InlineData(10, 3, 1)]  // Operație modulo normală
+    public void Modulo_AcoperireDecizie_InputValid(int a, int b, int expected)
     {
         Assert.Equal(expected, _calculator.Modulo(a, b));
     }
 
     [Fact]
-    public void Modulo_BranchCoverage_Exception()
+    public void Modulo_AcoperireDecizie_Exceptie()
     {
         Assert.Throws<ArgumentException>(() => _calculator.Modulo(5, 0));
     }
 
     [Theory]
-    [InlineData(1, false)]   // <= 1 branch (false)
-    [InlineData(9, false)]   // Loop finds divisor (false)
-    [InlineData(7, true)]    // Loop completes without divisor (true)
-    public void IsPrime_BranchCoverage(int number, bool expected)
+    [InlineData(1, false)]   // Ramura <= 1 (fals)
+    [InlineData(9, false)]   // Bucla găsește divizor (fals)
+    [InlineData(7, true)]    // Bucla se completează fără divizor (adevărat)
+    public void IsPrime_AcoperireDecizie(int number, bool expected)
     {
         Assert.Equal(expected, _calculator.IsPrime(number));
     }
 
-    // ------------------------
-    // 5. CONDITION COVERAGE
-    // ------------------------
-
+    // Acoperire condiție - testarea tuturor combinațiilor de condiții
     [Theory]
-    [InlineData(6, 2, 3)]    // Both a and b positive
-    [InlineData(-6, 2, -3)]  // a negative, b positive
-    [InlineData(6, -2, -3)]  // a positive, b negative
-    [InlineData(0, 2, 0)]    // a zero, b positive
-    public void Divide_ConditionCoverage(int a, int b, int expected)
+    [InlineData(6, 2, 3)]    // Ambele a și b pozitive
+    [InlineData(-6, 2, -3)]  // a negativ, b pozitiv
+    [InlineData(6, -2, -3)]  // a pozitiv, b negativ
+    [InlineData(0, 2, 0)]    // a zero, b pozitiv
+    public void Divide_AcoperireConditie(int a, int b, int expected)
     {
         Assert.Equal(expected, _calculator.Divide(a, b));
     }
 
     // ------------------------
-    // 6. PATH COVERAGE / BASIS PATH TESTING
+    // 5. CIRCUITE INDEPENDENTE
     // ------------------------
 
     [Theory]
-    [InlineData(2, 3, 8)]    // Path: normal execution through loop
-    [InlineData(5, 0, 1)]    // Path: skip loop (exponent = 0)
-    [InlineData(3, 1, 3)]    // Path: single iteration
-    public void Power_PathCoverage_ValidInputs(int baseNum, int exponent, int expected)
+    [InlineData(2, 3, 8)]    // Circuit: execuție normală prin buclă
+    [InlineData(5, 0, 1)]    // Circuit: sări peste buclă (exponent = 0)
+    [InlineData(3, 1, 3)]    // Circuit: o singură iterație
+    public void Power_CircuiteIndependente_InputuriValide(int baseNum, int exponent, int expected)
     {
         Assert.Equal(expected, _calculator.Power(baseNum, exponent));
     }
 
     [Fact]
-    public void Power_PathCoverage_ExceptionPath()
+    public void Power_CircuiteIndependente_CircuitExceptie()
     {
         Assert.Throws<ArgumentException>(() => _calculator.Power(2, -1));
     }
 
     // ========================================
-    // MUTATION TESTING
+    // GENERATOR DE MUTANȚI & OMOARĂ MUTANȚI
     // ========================================
 
     // ------------------------
-    // 7. MUTANT KILLING TESTS
+    // 6. OMOARĂ MUTANȚI NEECHIVALENȚI
     // ------------------------
 
     [Fact]
-    public void IsEven_KillsModuloMutant()
+    public void IsEven_OmoaraMutantModulo()
     {
-        Assert.True(_calculator.IsEven(0));   // Kills % 2 != 0 mutant
-        Assert.False(_calculator.IsEven(1));  // Kills % 2 == 1 mutant
+        Assert.True(_calculator.IsEven(0));   // Omoară mutantul % 2 != 0
+        Assert.False(_calculator.IsEven(1));  // Omoară mutantul % 2 == 1
     }
 
     [Fact]
-    public void Divide_KillsOperatorMutants()
+    public void Divide_OmoaraMutantiOperatori()
     {
-        Assert.Equal(3, _calculator.Divide(9, 3));  // Kills / -> * mutant
-        Assert.Equal(-3, _calculator.Divide(9, -3)); // Kills sign mutants
+        Assert.Equal(3, _calculator.Divide(9, 3));  // Omoară mutantul / -> *
+        Assert.Equal(-3, _calculator.Divide(9, -3)); // Omoară mutanții de semn
     }
 
     [Fact]
-    public void Add_KillsOperatorMutant()
+    public void Add_OmoaraMutantOperator()
     {
-        Assert.Equal(5, _calculator.Add(2, 3));  // Kills + -> - mutant
+        Assert.Equal(5, _calculator.Add(2, 3));  // Omoară mutantul + -> -
     }
 
     [Fact]
-    public void Power_KillsLoopMutants()
+    public void Power_OmoaraMutantiBucla()
     {
-        Assert.Equal(16, _calculator.Power(2, 4));  // Kills loop boundary mutants
-        Assert.Equal(1, _calculator.Power(5, 0));   // Kills initialization mutants
+        Assert.Equal(16, _calculator.Power(2, 4));  // Omoară mutanții frontieră buclă
+        Assert.Equal(1, _calculator.Power(5, 0));   // Omoară mutanții inițializare
+    }
+
+    [Fact]
+    public void Subtract_OmoaraMutantOperator()
+    {
+        Assert.Equal(1, _calculator.Subtract(4, 3));  // Omoară mutantul - -> +
+    }
+
+    [Fact]
+    public void Multiply_OmoaraMutantOperator()
+    {
+        Assert.Equal(6, _calculator.Multiply(2, 3));  // Omoară mutanții * -> / sau * -> +
     }
 
     // ========================================
-    // ERROR HANDLING & ROBUSTNESS TESTING
+    // TESTARE ROBUSTEȚE & GESTIONARE ERORI
     // ========================================
 
     [Fact]
-    public void Divide_ByZero_ThrowsCorrectException()
+    public void Divide_ImpartireLaZero_AruncaExceptiaCorecta()
     {
         var exception = Assert.Throws<ArgumentException>(() => _calculator.Divide(10, 0));
         Assert.Contains("Divider cannot be zero", exception.Message);
     }
 
     [Fact]
-    public void Modulo_ByZero_ThrowsCorrectException()
+    public void Modulo_ModuloLaZero_AruncaExceptiaCorecta()
     {
         var exception = Assert.Throws<ArgumentException>(() => _calculator.Modulo(5, 0));
         Assert.Contains("Modulo by zero not allowed", exception.Message);
     }
 
     [Fact]
-    public void Power_NegativeExponent_ThrowsCorrectException()
+    public void Power_ExponentNegativ_AruncaExceptiaCorecta()
     {
         var exception = Assert.Throws<ArgumentException>(() => _calculator.Power(2, -1));
         Assert.Contains("Negative exponent not supported", exception.Message);
