@@ -1,227 +1,139 @@
-# Raport - Testarea Sistemelor Software  
-## Tema: Testarea unei clase C# folosind un framework de testare unitară
+# ✅ Proiect de Testare - Calculator în C#
 
-**Nume:** Andrei Demit  
-**Grupa:** 1 
-**Data:** 31/05/2025  
+Acest proiect conține o clasă `Calculator` cu funcții aritmetice de bază și o suită de teste scrise în C# folosind xUnit. Testele aplică multiple strategii de testare software (black-box, white-box, mutation testing, robustețe).
 
 ---
 
-## 1. Descrierea clasei testate
+## 🔧 Structura Proiectului
 
-Clasa aleasă pentru testare este `Calculator`, care conține următoarele metode:
-
-- `int Divide(int a, int b)`
-- `bool IsEven(int number)`
-- `int Add(int a, int b)`
-
-Această clasă implementează funcționalități matematice simple, dar permite aplicarea tuturor strategiilor cerute.
+- `Calculator.cs` – Clasa cu metode matematice: Add, Subtract, Multiply, Divide, etc.
+- `CalculatorTests.cs` – Testele care acoperă toate strategiile cerute.
+- `README.md` – Documentația actuală.
 
 ---
 
-## 2. Framework folosit
+## 🧪 Strategii de Testare Aplicate
 
-Am utilizat:
+### 🎯 1. Testare Black-Box
 
-- **xUnit** pentru testarea unitară
-- **Stryker.NET** pentru testarea mutanților
-
----
-
-## 3. Strategii de generare a testelor
-
-### 3.1 Partiționare în clase de echivalență
-
-**Ce este:**  
-Împărțim datele de intrare în grupuri (clase) care sunt echivalente din punct de vedere comportamental. Un test din fiecare clasă este suficient.
-
-**De ce e utilă:**  
-Reduce numărul de teste, fără a pierde acoperirea logică a funcționalității.
-
-**Aplicare:**
+#### Clase de Echivalență
 
 - `Divide`:  
-  - Clasa validă → `Divide(10, 2)`  
-  - Clasa invalidă → `Divide(10, 0)`
+  - Valide: (10, 2), (-10, 2), (10, -2)  
+  - Invalid: (10, 0) → aruncă `ArgumentException`
+- `IsPrime`:  
+  - Prime: 2, 17  
+  - Non-prime: 1, 4
 
-```csharp
-[Theory]
-[InlineData(10, 2, 5)]
-[InlineData(20, 4, 5)]
-public void Divide_ValidInputs_ReturnsQuotient(...) { ... }
+#### Valori de Frontieră
 
-[Fact]
-public void Divide_ByZero_ThrowsException() { ... }
-```
-
----
-
-### 3.2 Analiza valorilor de frontieră
-
-**Ce este:**  
-Testăm valorile aflate la limita claselor de echivalență, unde apar frecvent defecte.
-
-**De ce e utilă:**  
-Captăm erorile care apar la „granițele” între comportamente valide și invalide.
-
-**Aplicare:**
-
-- `Divide(10, 1)`
-- `Divide(int.MaxValue, 1)`
-
-```csharp
-[Theory]
-[InlineData(10, 1, 10)]
-[InlineData(int.MaxValue, 1, int.MaxValue)]
-```
+- `Divide`:  
+  - `int.MaxValue`, `int.MinValue + 1`, (1,1)
+- `IsPrime`:  
+  - 0 (false), 1 (false), 2 (true)
+- `Power`:  
+  - Exponent = 0 → 2^0 = 1  
+  - Bază = 1 → 1^5 = 1
 
 ---
 
-### 3.3 Acoperire la nivel de instrucțiune (Statement Coverage)
+### 🔍 2. Testare White-Box
 
-**Ce este:**  
-Asigurăm că fiecare linie de cod este executată de cel puțin un test.
+#### Acoperire pe Instrucțiuni
 
-**De ce e utilă:**  
-Ne asigurăm că nu există cod „mort” care nu este niciodată verificat.
+- `Add(2,3)`, `Subtract(7,3)`, `Multiply(4,3)`  
+  => fiecare linie din metodele respective este acoperită
 
-**Aplicare:**
+#### Acoperire pe Decizii și Condiții
 
-- Linia cu `throw`
-- Linia cu `return a / b`
+- `IsEven`: test pentru `true` și `false`
+- `Modulo`: test pentru rezultat valid și excepție
+- `IsPrime`: testează și cazuri care intră în buclă
+- `Divide`: combină semnele lui `a` și `b` pentru toate condițiile
 
-```csharp
-[Fact]
-public void Divide_ByZero_ThrowsException() { ... }
+#### Circuite Independente
 
-[Fact]
-public void Divide_Valid_ReturnsValue() { ... }
-```
-
----
-
-### 3.4 Acoperire la nivel de decizie (Decision Coverage)
-
-**Ce este:**  
-Verificăm că fiecare decizie (`if`, `switch`, etc.) este evaluată atât pe ramura „true”, cât și pe „false”.
-
-**De ce e utilă:**  
-Acoperim toate rezultatele posibile ale ramurilor logice.
-
-**Aplicare:**
-
-```csharp
-[Theory]
-[InlineData(2, true)]
-[InlineData(3, false)]
-public void IsEven_WorksForBothCases(...) { ... }
-```
+- `Power(2,3)`, `Power(5,0)`, `Power(3,1)`  
+  → acoperă execuție completă, bypass buclă și o singură iterație
+- `Power(2,-1)` → acoperă circuitul cu excepție
 
 ---
 
-### 3.5 Acoperire la nivel de condiție (Condition Coverage)
+### 🧬 3. Testarea Mutanților
 
-**Ce este:**  
-Pentru expresii compuse (ex: `a > 0 && b > 0`), verificăm că fiecare condiție individuală poate fi atât adevărată, cât și falsă.
+Teste scrise pentru a „omoarî” mutanți artificiali creați de unelte ca Stryker.NET:
 
-**De ce e utilă:**  
-Detectează erori logice în condiții complexe.
-
-**Aplicare (simulată pentru `&&`):**
-
-```csharp
-// ipotetic: if (a > 0 && b > 0)
-// Testăm toate combinațiile de adevărat/fals pentru a și b
-```
+- `IsEven(0)` și `IsEven(1)` → omoară `% 2 ==` înlocuit cu `% 2 !=`
+- `Divide(9,3)` → omoară `/` înlocuit cu `*`
+- `Add(2,3)` → omoară `+` înlocuit cu `-`
+- `Subtract(4,3)` → omoară `-` înlocuit cu `+`
+- `Multiply(2,3)` → omoară `*` înlocuit cu `/` sau `+`
+- `Power(2,4)` și `Power(5,0)` → omoară mutanți în buclă și inițializare
 
 ---
 
-### 3.6 Circuite independente (Path/Cyclomatic Testing)
+### 🛡️ 4. Testare de Robusteză
 
-**Ce este:**  
-Testăm toate căile logice posibile prin codul metodei, fiecare cale fiind un circuit independent.
+Se verifică gestionarea corectă a excepțiilor:
 
-**De ce e utilă:**  
-Ne asigurăm că orice combinație de decizii a fost testată.
-
-**Aplicare:**
-
-```csharp
-// Simulăm combinații: a > 0 && b > 0, a > 0 && b <= 0, a <= 0
-```
-
-```csharp
-[Fact]
-public void Add_SimpleCase_WorksCorrectly()
-{
-    Assert.Equal(7, _calculator.Add(3, 4));
-}
-```
+- `Divide(10, 0)` → aruncă `ArgumentException` cu mesaj: *"Divider cannot be zero"*
+- `Modulo(5, 0)` → mesaj: *"Modulo by zero not allowed"*
+- `Power(2, -1)` → mesaj: *"Negative exponent not supported"*
 
 ---
 
-### 3.7 Testarea mutanților (Mutation Testing)
+## ✅ Funcții Implementate
 
-**Ce este:**  
-Folosim un tool care creează variante modificate ale codului (mutanți). Dacă testele nu detectează schimbarea, înseamnă că sunt incomplete.
+| Funcție         | Descriere                          |
+|------------------|-------------------------------------|
+| `Add(a, b)`      | Adună două numere                  |
+| `Subtract(a, b)` | Scade b din a                      |
+| `Multiply(a, b)` | Înmulțește                         |
+| `Divide(a, b)`   | Împarte (cu tratament pentru b=0) |
+| `Modulo(a, b)`   | Returnează restul împărțirii       |
+| `Power(a, b)`    | Ridică la putere (b >= 0)          |
+| `IsEven(n)`      | Verifică dacă numărul e par        |
+| `IsPrime(n)`     | Verifică primalitatea unui număr   |
 
-**De ce e utilă:**  
-Validează eficiența reală a testelor. Un test bun trebuie să „omoare” toți mutanții.
+---
 
-**Aplicare cu Stryker.NET:**
+## ▶️ Cum Rulezi Testele
 
 ```bash
-dotnet stryker
+dotnet test
+dotnet test --collect:"XPlat Code Coverage"
+dotnet test --filter "FullyQualifiedName~Divide"
 ```
 
 ---
 
-## 4. Raport testare mutanți
+## 🗂️ Tabel Rezumat Strategii de Testare
 
-### 4.1 Configurație
+| # | Strategie                        | Metodă Testată      | Exemplu Test / Scenariu                         | Tip Acoperire        |
+|---|----------------------------------|----------------------|--------------------------------------------------|----------------------|
+| 1 | Clase de Echivalență            | Divide               | (10,2), (-10,2), (10,0)                          | Valid / Invalid      |
+| 2 | Clase de Echivalență            | IsPrime              | 1, 2, 4, 17                                      | Prime / Non-Prime    |
+| 3 | Valori de Frontieră             | Divide               | int.MaxValue, int.MinValue+1, (1,1)              | Extreme / Minime     |
+| 4 | Valori de Frontieră             | IsPrime              | 0, 1, 2                                          | Limite inferior/superior |
+| 5 | Valori de Frontieră             | Power                | (2,0), (1,5)                                     | Exponent 0, Bază 1   |
+| 6 | Acoperire Instrucțiune          | Add, Subtract, Multiply | (2,3), (7,3), (4,3)                          | Execuție completă    |
+| 7 | Acoperire Decizie               | IsEven               | 2 (true), 3 (false)                              | Ramuri true/false    |
+| 8 | Acoperire Decizie               | Modulo               | (10,3), (5,0)                                    | Valid + excepție     |
+| 9 | Acoperire Decizie & Condiție   | IsPrime              | 1, 9, 7                                          | Buclă și condiții    |
+|10 | Acoperire Condiție              | Divide               | Combinații semn: (+,+), (-,+), (+,-), (0,+)      | Toate variantele     |
+|11 | Circuite Independente           | Power                | (2,3), (5,0), (3,1), (2,-1)                       | Toate căile logice   |
+|12 | Omoară Mutanți                  | IsEven               | 0, 1                                             | % 2 != 0, % 2 == 1   |
+|13 | Omoară Mutanți                  | Divide               | (9,3), (9,-3)                                    | / → * sau semn       |
+|14 | Omoară Mutanți                  | Add, Subtract, Multiply | (2,3), (4,3), (2,3)                          | + → -, - → +, * → /  |
+|15 | Omoară Mutanți                  | Power                | (2,4), (5,0)                                     | Buclă + inițializare |
+|16 | Robusteză / Gestionare erori    | Divide               | (10,0)                                           | Excepție mesaj       |
+|17 | Robusteză / Gestionare erori    | Modulo               | (5,0)                                            | Excepție mesaj       |
+|18 | Robusteză / Gestionare erori    | Power                | (2,-1)                                           | Excepție mesaj       |
 
-Tool: `Stryker.NET`  
-Comandă: `dotnet stryker`
 
-### 4.2 Rezultate
 
-- Mutanți generați: XX  
-- Omorâți: 28 
-- Supraviețuitori: 4  
-
-### 4.3 Teste suplimentare pentru 2 mutanți supraviețuitori
-
-#### Mutant 1: `% 2 == 0` → `% 2 != 0`
-
-```csharp
-[Fact]
-public void IsEven_Zero_IsTrue()
-{
-    Assert.True(_calculator.IsEven(0));
-}
-```
-
-#### Mutant 2: `/` → `*`
-
-```csharp
-[Fact]
-public void Divide_KnownCase_KillsMutant()
-{
-    Assert.Equal(3, _calculator.Divide(9, 3));
-}
-```
-
----
-
-## 5. Concluzii
-
-Prin aplicarea acestor strategii de testare, am obținut o acoperire logică și structurală completă a clasei `Calculator`. Testarea mutanților a scos în evidență câteva lacune, care au fost acoperite prin cazuri suplimentare. Astfel, am validat calitatea testelor scrise și eficiența metodologiilor de testare aplicate.
-
----
-
-## 6. Resurse
-
-- [xUnit](https://xunit.net)
-- [Stryker.NET](https://stryker-mutator.io/docs/stryker-net/introduction/)
-- [Documentația oficială .NET](https://learn.microsoft.com/en-us/dotnet/)
-- [Github Copilot Integrare in VS COde](https://code.visualstudio.com/docs/copilot/overview)
+### 6. Resurse
+- xUnit
+- Stryker.NET
+- Documentația oficială .NET
+- GitHub Copilot in VS Code: Intrebari precum care sunte testele sugerate pentru fiecare strategie de testare, care sunt beneficiile acestora, ce exemple sunt, cum pot sa testez codul in cel mai optim mod, interpretarea code coverage-ul.
